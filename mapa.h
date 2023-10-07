@@ -1,5 +1,4 @@
-struct mapa
-{
+struct mapa{
     char** matriz;
     int linhas;
     int colunas;
@@ -12,4 +11,12 @@ void lermapa(MAPA* m);
 void alocamapa(MAPA* m);
 void imprimemapa(MAPA* m);
 
+struct posicao {
+	int x;
+	int y;
+};
+
+typedef struct posicao POSICAO;
+
+void encontramapa(MAPA* m, POSICAO* p, char c);
 
