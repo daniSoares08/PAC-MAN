@@ -2,7 +2,7 @@
 --- 
 Este repositório contém uma recriação do clássico jogo PAC-MAN, desenvolvido em linguagem C. O projeto foi elaborado durante a certificação "Formação Linguagem C" pela Alura.
 
-##Destaques do Projeto:
+## Destaques do Projeto:
  - Movimentação Dinâmica: PAC-MAN e fantasmas movem-se pelo mapa.
  - Representação de Mapa: Utiliza matriz para representar o mapa do jogo.
  - Função Especial de Pílula: Habilidade de explodir pílulas.
