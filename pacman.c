@@ -3,10 +3,65 @@
 #include <time.h>
 #include "pacman.h"
 #include "mapa.h"
+#include "ui.h"
 
 MAPA m;
 POSICAO heroi;
+int tempilula = 0;
 
+int acabou() {
+	POSICAO pos;
+
+	int perdeu = !encontramapa(&m, &pos, HEROI);
+	int ganhou = !encontramapa(&m, &pos, FANTASMA);
+
+	return ganhou || perdeu;
+		
+}
+
+int ehdirecao (char direcao){
+    return direcao == 'a' ||
+            direcao == 's' ||
+            direcao == 'd' ||
+            direcao == 'w';
+}
+
+void move(char direcao){
+
+    if (!ehdirecao(direcao))
+            return;
+
+    int proximox = heroi.x;
+    int proximoy = heroi.y;
+    
+    switch (direcao)
+    {
+        case ESQUERDA:
+            proximoy--;
+            break;
+        case CIMA:
+            proximox--;
+            break;
+        case BAIXO:
+            proximox++;
+            break;
+        case DIREITA:
+            proximoy++;
+            break;
+    }
+
+    if (!podeandar(&m, HEROI, proximox, proximoy))
+        return;
+
+    if(ehpersonagem(&m, PILULA, proximox, proximoy)){
+        tempilula = 1;
+    }
+
+
+    andanomapa(&m, heroi.x, heroi.y, proximox, proximoy);
+    heroi.x = proximox;
+    heroi.y = proximoy;
+}
 
 int direcaofantasma(int xatual, int yatual, int* xdestino, int* ydestino){
     int opcoes[4][2] = {
@@ -54,52 +109,31 @@ void fantasmas() {
     liberamapa(&copia);
 }
 
+void explodepilula() {
 
-int ehdirecao (char direcao){
-    return direcao == 'a' ||
-            direcao == 's' ||
-            direcao == 'd' ||
-            direcao == 'w';
+	if(!tempilula) return;
+
+	explodepilula2(heroi.x, heroi.y, 0, 1, 3);
+	explodepilula2(heroi.x, heroi.y, 0, -1, 3);
+	explodepilula2(heroi.x, heroi.y, 1, 0, 3);
+	explodepilula2(heroi.x, heroi.y, -1, 0, 3);
+
+	tempilula = 0;
 }
 
-void move(char direcao){
+void explodepilula2(int x, int y, int somax, int somay, int qtd) {
+	
+	if(qtd == 0) return;
 
-    if (!ehdirecao(direcao))
-            return;
+	int novox = x + somax;
+	int novoy = y + somay;
 
-    int proximox = heroi.x;
-    int proximoy = heroi.y;
-    
-    switch (direcao)
-    {
-        case ESQUERDA:
-            proximoy--;
-            break;
-        case CIMA:
-            proximox--;
-            break;
-        case BAIXO:
-            proximox++;
-            break;
-        case DIREITA:
-            proximoy++;
-            break;
-    }
+	if(!ehvalida(&m, novox, novoy)) return;
+	if(ehparede(&m, novox, novoy)) return;
 
-    if (!podeandar(&m, HEROI, proximox, proximoy))
-        return;
+	m.matriz[novox][novoy] = VAZIO;
+	explodepilula2(novox, novoy, somax, somay, qtd - 1);
 
-
-    andanomapa(&m, heroi.x, heroi.y, proximox, proximoy);
-    heroi.x = proximox;
-    heroi.y = proximoy;
-}
-
-int acabou() {
-    POSICAO pos;
-    int heroi_no_mapa = encontramapa(&m, &pos, HEROI);
-
-    return !heroi_no_mapa;
 }
 
 int main (){
@@ -108,11 +142,17 @@ int main (){
     encontramapa(&m, &heroi, HEROI);
     do
     {
+        printf("Tem pilula: %s\n", (tempilula ? "Sim" : "Nao"));
         imprimemapa(&m);
+
         char comando;
         scanf(" %c", &comando);
+
         move(comando);
+        if(comando == BOMBA) explodepilula();
+
         fantasmas();
+
     } while (!acabou());
 
     liberamapa(&m);

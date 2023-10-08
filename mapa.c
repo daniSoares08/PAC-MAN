@@ -4,6 +4,46 @@
 #include "mapa.h"
 
 
+void lermapa(MAPA* m){
+    FILE* f;
+    f = fopen("pacman.txt", "r");
+    if (f == 0){
+        printf("Erro ao abrir o arquivo");
+    }
+
+    fscanf(f, "%d %d", &(m->linhas), &(m->colunas));
+    printf("Linhas: %d  | Colunas: %d\n", m->linhas, m->colunas);
+
+    alocamapa(m);
+
+    for(int i = 0; i < m->linhas; i++){
+        fscanf(f, "%s\n", m->matriz[i]);
+    }
+}
+
+void alocamapa(MAPA* m){
+    m->matriz = malloc(sizeof(char*) * m->linhas);
+    for (int i = 0; i < m->linhas; i++){
+        m->matriz[i] = malloc(sizeof(char) * (m->colunas + 1));
+    }
+}
+
+void copiamapa(MAPA* destino, MAPA* origem) {
+    destino->linhas = origem->linhas;
+    destino->colunas = origem->colunas;
+    alocamapa(destino);
+    for(int i = 0; i < origem->linhas; i++) {
+        strcpy(destino->matriz[i], origem->matriz[i]);
+    }
+}
+
+void liberamapa(MAPA* m){
+    for (int i = 0; i < m->linhas; i++){
+        free(m->matriz[i]);
+    }
+    free(m->matriz);
+}
+
 int encontramapa(MAPA* m, POSICAO* p, char c){
     for(int i = 0; i < m->linhas; i++){
         for (int j = 0; j < m->colunas; j++){
@@ -17,58 +57,12 @@ int encontramapa(MAPA* m, POSICAO* p, char c){
     return 0;
 }
 
-int ehparede(MAPA* m, int x, int y){
-    return m->matriz[x][y] == PAREDE_VERTICAL || 
-        m->matriz[x][y] == PAREDE_HORIZONTAL;
-}
-
-int ehpersonagem(MAPA* m, char personagem, int x, int y){
-    return m->matriz[x][y] == personagem;
-}
-
 int podeandar(MAPA* m, char personagem, int x, int y){
     return
         ehvalida(m, x, y) &&
         !ehparede(m, x, y) &&
         !ehpersonagem(m, personagem, x, y);
  }
-
-void liberamapa(MAPA* m){
-    for (int i = 0; i < m->linhas; i++){
-        free(m->matriz[i]);
-    }
-    free(m->matriz);
-}
-
-void alocamapa(MAPA* m){
-    m->matriz = malloc(sizeof(char*) * m->linhas);
-    for (int i = 0; i < m->linhas; i++){
-        m->matriz[i] = malloc(sizeof(char) * (m->colunas + 1));
-    }
-}
-
-void lermapa(MAPA* m){
-    FILE* f;
-    f = fopen("pacman.txt", "r");
-    if (f == 0){
-        printf("Erro ao abrir o arquivo");
-    }
-
-    fscanf(f, "%d %d", &(m->linhas), &(m->colunas));
-    printf("Linhas: %d  | Colunas: %d\n", m->linhas, m->colunas);
-
-    alocamapa(m);
-
-    for (int i = 0; i < 5; i++){
-        fscanf(f, "%s\n", m->matriz[i]);
-    }
-}
-
-void imprimemapa(MAPA* m){
-    for (int i = 0; i < 5; i++){
-        printf("%s\n", m->matriz[i]);
-    }
-}
 
 int ehvalida(MAPA* m, int x, int y) {
 	if(x >= m->linhas) 
@@ -79,8 +73,15 @@ int ehvalida(MAPA* m, int x, int y) {
 	return 1;	
 }
 
-int ehvazia(MAPA* m, int x, int y) {
-	return m->matriz[x][y] == VAZIO;
+int ehpersonagem(MAPA* m, char personagem, int x, int y){
+    return 
+        m->matriz[x][y] == personagem;
+}
+
+int ehparede(MAPA* m, int x, int y){
+    return 
+        m->matriz[x][y] == PAREDE_VERTICAL || 
+        m->matriz[x][y] == PAREDE_HORIZONTAL;
 }
 
 void andanomapa(MAPA* m, int xorigem, int yorigem, 
@@ -91,11 +92,3 @@ void andanomapa(MAPA* m, int xorigem, int yorigem,
     m->matriz[xorigem][yorigem] = VAZIO;
 }
 
-void copiamapa(MAPA* destino, MAPA* origem) {
-    destino->linhas = origem->linhas;
-    destino->colunas = origem->colunas;
-    alocamapa(destino);
-    for(int i = 0; i < origem->linhas; i++) {
-        strcpy(destino->matriz[i], origem->matriz[i]);
-    }
-}
