@@ -91,4 +91,3 @@ void andanomapa(MAPA* m, int xorigem, int yorigem,
     m->matriz[xdestino][ydestino] = personagem;
     m->matriz[xorigem][yorigem] = VAZIO;
 }
-

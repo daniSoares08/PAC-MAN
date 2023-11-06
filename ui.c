@@ -74,4 +74,3 @@ void imprimemapa(MAPA* m) {
 
     }
 }
-
