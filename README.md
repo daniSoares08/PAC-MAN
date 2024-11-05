@@ -19,7 +19,7 @@ Este repositório contém uma recriação do clássico jogo PAC-MAN, desenvolvid
  - ### Compile o código:
  - ``gcc pacman.c mapa.c ui.c -o pacman``
  - ### Execute o jogo:
- - ``./PAC-MAN-C``
+ - ``./pacman``
  - Siga as instruções na tela e divirta-se!
 ---
 ## Contribuição
